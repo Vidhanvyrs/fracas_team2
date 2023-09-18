@@ -1,7 +1,23 @@
 import Image from "next/image";
-import React from "react";
+import React, { useEffect, useState } from "react";
 
 export default function Home() {
+  const [timezone, setTimezone] = useState(null);
+  useEffect(() => {
+    async function fetchConfig() {
+      try {
+        const response = await fetch("/timeconfig.json");
+        if (!response.ok) {
+          throw new Error("Failed to fetch configuration");
+        }
+        const data = await response.json();
+        setTimezone(data.timezone);
+      } catch (error) {
+        console.error("Error loading configuration:", error);
+      }
+    }
+    fetchConfig();
+  }, []);
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -109,6 +125,11 @@ export default function Home() {
           </p>
         </a>
       </div>
+      {timezone && (
+        <div className="timezone-info">
+          <p>Timezone: {timezone}</p>
+        </div>
+      )}
     </main>
   );
 }
